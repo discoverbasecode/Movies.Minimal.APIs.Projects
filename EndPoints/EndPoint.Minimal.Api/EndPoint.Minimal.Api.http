@@ -1,6 +1,15 @@
-@EndPoint.Minimal.Api_HostAddress = http://localhost:5239
+﻿@EndPoint.Minimal.Api_HostAddress = http://localhost:5239
 
-GET {{EndPoint.Minimal.Api_HostAddress}}/genres/
+### دریافت لیست ژانرها
+GET {{EndPoint.Minimal.Api_HostAddress}}/genres
 Accept: application/json
 
-###
+### ایجاد ژانر جدید
+POST {{EndPoint.Minimal.Api_HostAddress}}/createGenre
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Science",
+  "description": "Science fiction focusing on intense"
+}
