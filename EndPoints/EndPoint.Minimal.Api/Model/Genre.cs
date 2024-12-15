@@ -1,16 +1,12 @@
-﻿namespace EndPoint.Minimal.Api.Model;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Genre
+namespace EndPoint.Minimal.Api.Model;
+
+public class Genre(string name, string description)
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = new();
 
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public string Name { get; set; } = name;
 
-    public Genre(Guid id, string name, string description)
-    {
-        Id = id;
-        Name = name;
-        Description = description;
-    }
+    public string Description { get; set; } = description;
 }

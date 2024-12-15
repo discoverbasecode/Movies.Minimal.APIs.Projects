@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EndPoint.Minimal.Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20241215171424_init")]
-    partial class init
+    [Migration("20241215173231_AddGenreModel")]
+    partial class AddGenreModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,8 @@ namespace EndPoint.Minimal.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
