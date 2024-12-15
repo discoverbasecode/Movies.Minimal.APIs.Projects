@@ -10,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+builder.Services.AddDbContext<ApplicationContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
+
 
 builder.Services.AddCors(options =>
 {
@@ -25,7 +28,6 @@ builder.Services.AddCors(options =>
 
 });
 builder.Services.AddOutputCache();
-builder.Services.AddDbContext<ApplicationContext>(o => o.UseSqlServer("DBConnection"));
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -37,20 +39,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/genres", [EnableCors(policyName: "Free")] () =>
-{
+//app.MapGet("/genres", [EnableCors(policyName: "Free")] () =>
+//{
 
-    var genre = new List<Genre>()
-    {
-        new ("Action", "Action Video Category"),
-        new ("Sport", "Sport Video Category"),
+//    var genre = new List<Genre>()
+//    {
+//        new ("Action", "Action Video Category"),
+//        new ("Sport", "Sport Video Category"),
 
-    };
+//    };
 
-    var result = genre.All(c => c.Name == "Sport");
-    return genre;
+//    var result = genre.All(c => c.Name == "Sport");
+//    return genre;
 
-}).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(15)));
+//}).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(15)));
 app.UseOutputCache();
 app.UseCors();
 app.Run();
