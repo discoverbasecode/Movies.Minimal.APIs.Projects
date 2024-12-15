@@ -13,3 +13,7 @@ Accept: application/json
   "name": "Science",
   "description": "Science fiction focusing on intense"
 }
+
+
+### دریافت یک ژانر بر اساس id
+GET http://localhost:5239/genre/12F06DE8-C4BB-42E2-79A2-08DD1D3060C4
