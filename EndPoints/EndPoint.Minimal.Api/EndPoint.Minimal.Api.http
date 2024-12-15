@@ -1,6 +1,6 @@
 @EndPoint.Minimal.Api_HostAddress = http://localhost:5239
 
-GET {{EndPoint.Minimal.Api_HostAddress}}/weatherforecast/
+GET {{EndPoint.Minimal.Api_HostAddress}}/genres/
 Accept: application/json
 
 ###
