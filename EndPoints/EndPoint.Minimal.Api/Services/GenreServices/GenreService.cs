@@ -39,4 +39,38 @@ public class GenreService(ApplicationContext context) : IGenreService
 
         return result;
     }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var existingGenre = await context.Genres
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (existingGenre is null)
+        {
+            throw new ArgumentException($"No genre found with ID: {id}", nameof(id));
+        }
+
+        context.Genres.Remove(existingGenre);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Guid id, Genre genre)
+    {
+        if (genre == null)
+        {
+            throw new ArgumentNullException(nameof(genre), "Genre cannot be null");
+        }
+
+        var existingGenre = await context.Genres
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (existingGenre == null)
+        {
+            throw new ArgumentException($"No genre found with ID: {genre.Id}", nameof(genre));
+        }
+
+        existingGenre.Name = genre.Name;
+        existingGenre.Description = genre.Description;
+        await context.SaveChangesAsync();
+    }
 }

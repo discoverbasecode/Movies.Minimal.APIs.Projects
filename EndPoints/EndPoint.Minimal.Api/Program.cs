@@ -11,7 +11,8 @@ builder.Services.AddOutputCache(options =>
 {
     options.AddBasePolicy(policy => policy.Expire(TimeSpan.FromMinutes(10)));
 });
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
@@ -22,7 +23,15 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTheme(ScalarTheme.Purple);
+    });
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.DocumentTitle = "Minimal API Movies ";
+    });
     app.MapOpenApi();
 }
 

@@ -75,5 +75,21 @@ public class GenreEndpoints
                 return Results.Problem($"An unexpected error occurred: {ex.Message}");
             }
         }).WithTags("Return Get By Guid Genre");
+
+
+        app.MapPut("/genre/{id:guid}", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
+        {
+            await service.UpdateAsync(id, genre);
+            await outputCacheStore.EvictByTagAsync("genres-get", default);
+            return Results.NoContent();
+        }).WithTags("Update Genre");
+
+
+        app.MapPut("/genreRemove/{id:guid}", async (IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
+        {
+            await service.DeleteAsync(id);
+            await outputCacheStore.EvictByTagAsync("genres-get", default);
+            return Results.NoContent();
+        }).WithTags("Remove Genre");
     }
 }
