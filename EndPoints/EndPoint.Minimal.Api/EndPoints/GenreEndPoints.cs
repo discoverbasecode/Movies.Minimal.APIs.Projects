@@ -8,8 +8,10 @@ public class GenreEndpoints
 {
     public static void MapEndpoints(WebApplication app)
     {
-        // ثبت مسیر POST برای ایجاد ژانر جدید
-        app.MapPost("/createGenre", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore) =>
+
+        var genresEndpoints = app.MapGroup("/genres");
+
+        genresEndpoints.MapPost("/", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore) =>
         {
             try
             {
@@ -29,10 +31,9 @@ public class GenreEndpoints
             {
                 return Results.Problem($"An unexpected error occurred: {ex.Message}");
             }
-        }).WithTags("Return Create Genre"); ;
+        }).WithTags("Create Genre"); ;
 
-        // ثبت مسیر GET برای دریافت لیست ژانرها
-        app.MapGet("/genres", async (IGenreService service) =>
+        genresEndpoints.MapGet("/", async (IGenreService service) =>
         {
             try
             {
@@ -51,10 +52,9 @@ public class GenreEndpoints
             {
                 return Results.Problem($"An unexpected error occurred: {ex.Message}");
             }
-        }).WithTags("Return Get All Genre");
+        }).WithTags("Get All Genre");
 
-        // ثبت مسیر GET برای دریافت یک ژانر
-        app.MapGet("/genre/{id:guid}", async (IGenreService service, Guid id) =>
+        genresEndpoints.MapGet("/{id:guid}", async (IGenreService service, Guid id) =>
         {
 
             try
@@ -74,18 +74,16 @@ public class GenreEndpoints
             {
                 return Results.Problem($"An unexpected error occurred: {ex.Message}");
             }
-        }).WithTags("Return Get By Guid Genre");
+        }).WithTags("Get By Guid Genre");
 
-
-        app.MapPut("/genre/{id:guid}", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
+        genresEndpoints.MapPut("/{id:guid}", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
         {
             await service.UpdateAsync(id, genre);
             await outputCacheStore.EvictByTagAsync("genres-get", default);
             return Results.NoContent();
         }).WithTags("Update Genre");
 
-
-        app.MapPut("/genreRemove/{id:guid}", async (IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
+        genresEndpoints.MapDelete("/{id:guid}", async (IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
         {
             await service.DeleteAsync(id);
             await outputCacheStore.EvictByTagAsync("genres-get", default);
