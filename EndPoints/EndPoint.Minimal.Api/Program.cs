@@ -1,5 +1,6 @@
 using EndPoint.Minimal.Api.Data;
 using EndPoint.Minimal.Api.EndPoints;
+using EndPoint.Minimal.Api.Services.ActorServices;
 using EndPoint.Minimal.Api.Services.GenreServices;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -16,7 +17,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
+
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IActorService, ActorService>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
