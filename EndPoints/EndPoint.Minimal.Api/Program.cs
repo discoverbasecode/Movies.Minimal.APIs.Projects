@@ -17,6 +17,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

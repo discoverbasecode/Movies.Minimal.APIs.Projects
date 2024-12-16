@@ -1,4 +1,5 @@
-﻿using EndPoint.Minimal.Api.DTOs;
+﻿using AutoMapper;
+using EndPoint.Minimal.Api.DTOs;
 using EndPoint.Minimal.Api.Services.GenreServices;
 using Microsoft.AspNetCore.OutputCaching;
 
@@ -33,7 +34,7 @@ public class GenreEndpoints
             }
         }).WithTags("Create Genre"); ;
 
-        genresEndpoints.MapGet("/", async (IGenreService service) =>
+        genresEndpoints.MapGet("/", async (IGenreService service, IMapper mapper) =>
         {
             try
             {

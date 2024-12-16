@@ -1,12 +1,14 @@
-﻿using EndPoint.Minimal.Api.Data;
+﻿using AutoMapper;
+using EndPoint.Minimal.Api.Data;
 using EndPoint.Minimal.Api.DTOs;
 using EndPoint.Minimal.Api.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace EndPoint.Minimal.Api.Services.GenreServices;
 
-public class GenreService(ApplicationContext context) : IGenreService
+public class GenreService(ApplicationContext context, IMapper mapper) : IGenreService
 {
+
 
     public async Task<Guid> CreateAsync(CreateGenreDto command)
     {
@@ -29,42 +31,25 @@ public class GenreService(ApplicationContext context) : IGenreService
     public async Task<List<GetAllGenreDto>> GetAllAsync()
     {
         var genres = await context.Genres.ToListAsync();
+        return mapper.Map<List<GetAllGenreDto>>(genres);
 
-        return genres.Select(item => new GetAllGenreDto
-        {
-            Id = item.Id,
-            Name = item.Name,
-            Description = item.Description
-        }).ToList();
     }
-
 
     public async Task<GetByIdGenreDto> GetIdAsync(Guid id)
     {
         var result = await context.Genres.FindAsync(id);
         if (result is null)
             throw new ArgumentException("Genre cannot be null.");
-        var genreResult = new GetByIdGenreDto
-        {
-            Id = result.Id,
-            Name = result.Name,
-            Description = result.Description
-        };
-        return genreResult;
+
+        return mapper.Map<GetByIdGenreDto>(result);
+
     }
 
     public async Task<GetByNameGenreDto> GetByNameAsync(string name)
     {
         var result = await context.Genres.FirstOrDefaultAsync(c => c.Name == name);
-
-        return new GetByNameGenreDto()
-        {
-            Id = result.Id,
-            Name = result.Name,
-            Description = result.Description
-        };
+        return mapper.Map<GetByNameGenreDto>(result);
     }
-
 
     public async Task DeleteAsync(Guid id)
     {
