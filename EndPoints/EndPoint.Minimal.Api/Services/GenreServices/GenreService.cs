@@ -1,4 +1,5 @@
 ﻿using EndPoint.Minimal.Api.Data;
+using EndPoint.Minimal.Api.DTOs;
 using EndPoint.Minimal.Api.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,17 +8,17 @@ namespace EndPoint.Minimal.Api.Services.GenreServices;
 public class GenreService(ApplicationContext context) : IGenreService
 {
 
-    public async Task<Guid> CreateAsync(Genre genre)
+    public async Task<Guid> CreateAsync(CreateGenreDto command)
     {
-        if (genre is null)
+        if (command is null)
             throw new ArgumentException("Genre cannot be null.");
 
-        var findGenre = await context.Genres.FirstOrDefaultAsync(g => g.Name == genre.Name);
+        var findGenre = await context.Genres.FirstOrDefaultAsync(g => g.Name == command.Name);
 
         if (findGenre is not null)
-            throw new InvalidOperationException($"Genre with name '{genre.Name}' already exists.");
+            throw new InvalidOperationException($"Genre with name '{command.Name}' already exists.");
 
-        var newGenre = new Genre(genre.Name, genre.Description);
+        var newGenre = new Genre(command.Name, command.Description);
 
         await context.Genres.AddAsync(newGenre);
         await context.SaveChangesAsync();
@@ -25,20 +26,45 @@ public class GenreService(ApplicationContext context) : IGenreService
         return newGenre.Id;
     }
 
-    public async Task<List<Genre>> GetAllAsync()
+    public async Task<List<GetAllGenreDto>> GetAllAsync()
     {
         var genres = await context.Genres.ToListAsync();
-        return genres;
+
+        return genres.Select(item => new GetAllGenreDto
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Description = item.Description
+        }).ToList();
     }
 
-    public async Task<Genre> GetIdAsync(Guid id)
+
+    public async Task<GetByIdGenreDto> GetIdAsync(Guid id)
     {
         var result = await context.Genres.FindAsync(id);
         if (result is null)
             throw new ArgumentException("Genre cannot be null.");
-
-        return result;
+        var genreResult = new GetByIdGenreDto
+        {
+            Id = result.Id,
+            Name = result.Name,
+            Description = result.Description
+        };
+        return genreResult;
     }
+
+    public async Task<GetByNameGenreDto> GetByNameAsync(string name)
+    {
+        var result = await context.Genres.FirstOrDefaultAsync(c => c.Name == name);
+
+        return new GetByNameGenreDto()
+        {
+            Id = result.Id,
+            Name = result.Name,
+            Description = result.Description
+        };
+    }
+
 
     public async Task DeleteAsync(Guid id)
     {
@@ -54,11 +80,11 @@ public class GenreService(ApplicationContext context) : IGenreService
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Guid id, Genre genre)
+    public async Task UpdateAsync(Guid id, UpdateGenreDto command)
     {
-        if (genre == null)
+        if (command == null)
         {
-            throw new ArgumentNullException(nameof(genre), "Genre cannot be null");
+            throw new ArgumentNullException(nameof(command), "Genre cannot be null");
         }
 
         var existingGenre = await context.Genres
@@ -66,11 +92,11 @@ public class GenreService(ApplicationContext context) : IGenreService
 
         if (existingGenre == null)
         {
-            throw new ArgumentException($"No genre found with ID: {genre.Id}", nameof(genre));
+            throw new ArgumentException($"No genre found with ID: {command.Id}", nameof(command));
         }
 
-        existingGenre.Name = genre.Name;
-        existingGenre.Description = genre.Description;
+        existingGenre.Name = command.Name;
+        existingGenre.Description = command.Description;
         await context.SaveChangesAsync();
     }
 }

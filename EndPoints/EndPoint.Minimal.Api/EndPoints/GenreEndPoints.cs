@@ -1,4 +1,4 @@
-﻿using EndPoint.Minimal.Api.Model;
+﻿using EndPoint.Minimal.Api.DTOs;
 using EndPoint.Minimal.Api.Services.GenreServices;
 using Microsoft.AspNetCore.OutputCaching;
 
@@ -11,7 +11,7 @@ public class GenreEndpoints
 
         var genresEndpoints = app.MapGroup("/genres");
 
-        genresEndpoints.MapPost("/", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore) =>
+        genresEndpoints.MapPost("/", async (CreateGenreDto genre, IGenreService service, IOutputCacheStore outputCacheStore) =>
         {
             try
             {
@@ -76,7 +76,29 @@ public class GenreEndpoints
             }
         }).WithTags("Get By Guid Genre");
 
-        genresEndpoints.MapPut("/{id:guid}", async (Genre genre, IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
+        genresEndpoints.MapGet("/{name}", async (IGenreService service, string name) =>
+        {
+            try
+            {
+                var genre = await service.GetByNameAsync(name);
+                return Results.Ok(genre);
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new { Message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.Conflict(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An unexpected error occurred: {ex.Message}");
+            }
+        }).WithTags("Get By Name Genre");
+
+
+        genresEndpoints.MapPut("/{id:guid}", async (UpdateGenreDto genre, IGenreService service, IOutputCacheStore outputCacheStore, Guid id) =>
         {
             await service.UpdateAsync(id, genre);
             await outputCacheStore.EvictByTagAsync("genres-get", default);
