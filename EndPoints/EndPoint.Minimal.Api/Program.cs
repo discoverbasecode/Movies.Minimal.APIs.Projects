@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IActorService, ActorService>();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
@@ -28,15 +28,9 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapScalarApiReference(options =>
-    {
-        options.WithTheme(ScalarTheme.Purple);
-    });
+    app.MapScalarApiReference(options => { options.WithTheme(ScalarTheme.Purple); });
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.DocumentTitle = "Minimal API Movies ";
-    });
+    app.UseSwaggerUI(options => { options.DocumentTitle = "Minimal API Movies "; });
     app.MapOpenApi();
 }
 
