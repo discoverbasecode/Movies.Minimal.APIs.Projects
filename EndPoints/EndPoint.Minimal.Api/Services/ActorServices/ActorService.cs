@@ -2,11 +2,12 @@
 using EndPoint.Minimal.Api.Data;
 using EndPoint.Minimal.Api.DTOs;
 using EndPoint.Minimal.Api.Model;
+using EndPoint.Minimal.Api.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace EndPoint.Minimal.Api.Services.ActorServices;
 
-public class ActorService(ApplicationContext context, IMapper mapper) : IActorService
+public class ActorService(ApplicationContext context, IMapper mapper, IHttpContextAccessor accessor) : IActorService
 {
     public async Task<Guid> CreateAsync(CreateActorDto command)
     {
@@ -25,15 +26,21 @@ public class ActorService(ApplicationContext context, IMapper mapper) : IActorSe
         return newActor.Id;
     }
 
-    public async Task<List<GetAllActorDto>> GetAllAsync()
+    public async Task<List<GetAllActorDto>> GetAllAsync(PaginationParams pagination)
     {
-        var actors = await context.Actors.ToListAsync();
-        return mapper.Map<List<GetAllActorDto>>(actors);
-    }
+        var query = context.Actors.AsQueryable();
+        await accessor.HttpContext!.InsertPaginationParameterResponseHeader(query);
+        var paginatedList = await query
+            .OrderBy(c => c.FullName)
+            .Paginate(pagination)
+            .ToListAsync();
 
+        return mapper.Map<List<GetAllActorDto>>(paginatedList);
+    }
+    
     public async Task<GetByIdActorDto> GetIdAsync(Guid id)
     {
-        var result = await context.Actors.FindAsync(id);
+        var result = await context.Actors.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         if (result is null)
             throw new ArgumentException("Genre cannot be null.");
 
