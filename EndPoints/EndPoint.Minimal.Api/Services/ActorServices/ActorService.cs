@@ -11,6 +11,7 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
 {
     public async Task<Guid> CreateAsync(CreateActorDto command)
     {
+
         if (command is null)
             throw new ArgumentException("Actor cannot be null.");
 
@@ -19,7 +20,11 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
         if (findActor is not null)
             throw new InvalidOperationException($"Actor with name '{command.FullName}' already exists.");
 
-        var uploadsFolder = Path.Combine("uploads", "images");
+        var dateFolder = DateTime.UtcNow.ToString("yyyy-MM-dd");
+        var uploadsFolder = Path.Combine("uploads", "images", dateFolder);
+        
+        Directory.CreateDirectory(uploadsFolder);
+
         var filePath = await FileHelper.SaveFileAsync(command.Picture, uploadsFolder);
 
         var newActor = new Actor(
@@ -32,8 +37,9 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
         await context.Actors.AddAsync(newActor);
         await context.SaveChangesAsync();
         return newActor.Id;
+
     }
-    
+
     public async Task<List<GetAllActorDto>> GetAllAsync(PaginationParams pagination)
     {
         var query = context.Actors.AsQueryable();
