@@ -14,7 +14,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Genre>().Property(c => c.Name).HasMaxLength(200).IsRequired();
-        modelBuilder.Entity<Actor>().Property(c => c.Picture).IsUnicode();
+        modelBuilder.Entity<Actor>().Property(c => c.PictureName).IsUnicode();
 
     }
 }

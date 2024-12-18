@@ -37,6 +37,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseOutputCache();
 GenreEndpoints.MapEndpoints(app);
+app.MapGroup("/actors").MapActor();
 
 
 app.Run();

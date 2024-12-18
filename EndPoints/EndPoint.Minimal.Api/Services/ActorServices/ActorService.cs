@@ -19,13 +19,21 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
         if (findActor is not null)
             throw new InvalidOperationException($"Actor with name '{command.FullName}' already exists.");
 
-        var newActor = new Actor(command.FullName, command.DateOfBirth, command.Picture);
+        var uploadsFolder = Path.Combine("uploads", "images");
+        var filePath = await FileHelper.SaveFileAsync(command.Picture, uploadsFolder);
+
+        var newActor = new Actor(
+            command.FullName,
+            command.DateOfBirth,
+            filePath,
+            command.Picture.FileName
+        );
 
         await context.Actors.AddAsync(newActor);
         await context.SaveChangesAsync();
         return newActor.Id;
     }
-
+    
     public async Task<List<GetAllActorDto>> GetAllAsync(PaginationParams pagination)
     {
         var query = context.Actors.AsQueryable();
@@ -37,7 +45,7 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
 
         return mapper.Map<List<GetAllActorDto>>(paginatedList);
     }
-    
+
     public async Task<GetByIdActorDto> GetIdAsync(Guid id)
     {
         var result = await context.Actors.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
@@ -78,7 +86,7 @@ public class ActorService(ApplicationContext context, IMapper mapper, IHttpConte
 
         existActor.FullName = command.FullName;
         existActor.DateOfBirth = command.DateOfBirth;
-        existActor.Picture = command.Picture;
+        //  existActor.Picture = command.Picture;
 
         await context.SaveChangesAsync();
     }

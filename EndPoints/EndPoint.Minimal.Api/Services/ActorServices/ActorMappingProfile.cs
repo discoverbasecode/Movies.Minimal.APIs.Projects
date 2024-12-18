@@ -12,5 +12,6 @@ public class ActorMappingProfile : Profile
         CreateMap<Actor, UpdateActorDto>();
         CreateMap<Actor, GetAllActorDto>();
         CreateMap<Actor, GetByIdActorDto>();
+        CreateMap<CreateActorDto, Actor>().ForMember(c => c.PictureName, opt => opt.Ignore());
     }
 }
